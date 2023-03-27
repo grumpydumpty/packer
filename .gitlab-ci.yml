@@ -10,7 +10,7 @@ build:
     - AUTH=$(printf "%s:%s" ${HARBOR_USER} ${HARBOR_PASSWORD} | base64 | tr -d '\n')
     - echo "{\"auths\":{\"${HARBOR_HOST}\":{\"username\":\"${HARBOR_USER}\",\"password\":\"${HARBOR_PASSWORD}\",\"email\":\"${HARBOR_EMAIL}\",\"auth\":\"${AUTH}\"}}}" > /kaniko/.docker/config.json
   variables:
-    IMAGE_NAME: "hugo"
+    IMAGE_NAME: "packer"
     IMAGE_TAG: "dev"
   script:
     - /kaniko/executor
