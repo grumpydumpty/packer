@@ -58,7 +58,3 @@ These can be set at any level but we generally set them at the group or project 
 | HARBOR_USER     | Username of harbor user with permissions to push images                         |
 | HARBOR_EMAIL    | Email  of harbor user with permissions to push images                           |
 | HARBOR_PASSWORD | Password of harbor user with permissions to push images                         |
-
-## Credits
-
-_Originally taken from here: [tenthirtyam/container-packer](https://github.com/tenthirtyam/container-packer/)_
