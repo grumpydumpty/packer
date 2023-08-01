@@ -4,6 +4,10 @@ FROM photon:5.0
 ARG OS_ARCH="amd64"
 ARG PACKER_VERSION="1.8.6"
 ARG VSPHERE_PLUGIN_VERSION="1.1.1"
+ARG USER=vlabs
+ARG USER_ID=1000
+ARG GROUP=users
+ARG GROUP_ID=100
 #ARG LABEL_PREFIX=com.vmware.eocto
 
 # add metadata via labels
@@ -14,23 +18,36 @@ ARG VSPHERE_PLUGIN_VERSION="1.1.1"
 #LABEL ${LABEL_PREFIX}.maintainer.email="rcroft@vmware.com"
 #LABEL ${LABEL_PREFIX}.maintainer.url="https://gitlab.eng.vmware.com/rcroft/"
 #LABEL ${LABEL_PREFIX}.released="9999-99-99"
-#LABEL ${LABEL_PREFIX}.based-on="photon:4.0"
-#LABEL ${LABEL_PREFIX}.project="commonpool"
-
-# set working to user's home directory
-WORKDIR ${HOME}
+#LABEL ${LABEL_PREFIX}.based-on="photon:5.0"
+#LABEL ${LABEL_PREFIX}.project="containers"
 
 # update repositories, install packages, and then clean up
 RUN tdnf update -y && \
-    tdnf install -y wget tar git unzip && \
+    tdnf install -y wget tar git shadow unzip && \
+    # add user/group
+    useradd -u ${USER_ID} -m ${USER} && \
+    chown -R ${USER_ID}:${GROUP_ID} /home/${USER} && \
+    # add /workspace and give user permissions
+    mkdir -p /workspace && \
+    chown -R ${USER_ID}:${GROUP_ID} /workspace && \
+    # set git config
+    echo -e "[safe]\n\tdirectory=/workspace" > /etc/gitconfig && \
+    # download and install packer
     wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
     unzip -o -d /usr/local/bin/ packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
     packer plugins install github.com/hashicorp/vsphere v${VSPHERE_PLUGIN_VERSION} && \
     rm packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
-    tdnf erase -y unzip && \
+    # clean up
+    tdnf erase -y unzip shadow && \
     tdnf clean all
 
-# set entrypoint to terraform, not a shell
+# set user
+USER ${USER}
+
+# set working directory
+WORKDIR /workspace
+
+# set entrypoint to packer, not a shell
 ENTRYPOINT ["packer"]
 
 #############################################################################
