@@ -25,11 +25,11 @@ ARG GROUP_ID=100
 RUN tdnf update -y && \
     tdnf install -y wget tar git shadow unzip && \
     # add user/group
-    useradd -u ${USER_ID} -m ${USER} && \
-    chown -R ${USER_ID}:${GROUP_ID} /home/${USER} && \
+    useradd -u ${USER_ID} -g ${GROUP} -m ${USER} && \
+    chown -R ${USER}:${GROUP} /home/${USER} && \
     # add /workspace and give user permissions
     mkdir -p /workspace && \
-    chown -R ${USER_ID}:${GROUP_ID} /workspace && \
+    chown -R ${USER}:${GROUP} /workspace && \
     # set git config
     echo -e "[safe]\n\tdirectory=/workspace" > /etc/gitconfig && \
     # download and install packer
