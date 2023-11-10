@@ -2,8 +2,6 @@ FROM photon:5.0
 
 # set argument defaults
 ARG OS_ARCH="amd64"
-ARG PACKER_VERSION="1.9.4"
-ARG VSPHERE_PLUGIN_VERSION="1.2.2"
 ARG USER=vlabs
 ARG USER_ID=1280
 ARG GROUP=users
@@ -23,7 +21,7 @@ ARG GROUP_ID=100
 
 # update repositories, install packages, and then clean up
 RUN tdnf update -y && \
-    tdnf install -y wget tar git shadow unzip && \
+    tdnf install -y ca-certificates coreutils curl jq shadow tar unzip && \
     # add user/group
     useradd -u ${USER_ID} -g ${GROUP} -m ${USER} && \
     chown -R ${USER}:${GROUP} /home/${USER} && \
@@ -32,11 +30,14 @@ RUN tdnf update -y && \
     chown -R ${USER}:${GROUP} /workspace && \
     # set git config
     echo -e "[safe]\n\tdirectory=/workspace" > /etc/gitconfig && \
-    # download and install packer
-    wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
-    unzip -o -d /usr/local/bin/ packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
-    packer plugins install github.com/hashicorp/vsphere v${VSPHERE_PLUGIN_VERSION} && \
-    rm packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
+    # grab packer
+    PACKER_VERSION=$(curl -H 'Accept: application/json' -sSL https://github.com/hashicorp/packer/releases/latest | jq -r '.tag_name' | tr -d 'v') && \
+    curl -skSLo packer.zip https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_${OS_ARCH}.zip && \
+    unzip -o -d /usr/local/bin/ packer.zip && \
+    rm -f packer.zip && \
+    # grab packer vsphere plugin
+    VSPHERE_PLUGIN_VERSION=$(curl -H 'Accept: application/json' -sSL https://github.com/hashicorp/packer-plugin-vsphere/releases/latest | jq -r '.tag_name') && \
+    packer plugins install github.com/hashicorp/vsphere ${VSPHERE_PLUGIN_VERSION} && \
     # clean up
     tdnf erase -y unzip shadow && \
     tdnf clean all
