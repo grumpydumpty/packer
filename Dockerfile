@@ -23,6 +23,7 @@ ARG GROUP_ID=100
 RUN tdnf update -y && \
     tdnf install -y ca-certificates coreutils curl jq shadow tar unzip && \
     # add user/group
+    # groupadd -g ${GROUP_ID} ${GROUP} && \
     useradd -u ${USER_ID} -g ${GROUP} -m ${USER} && \
     chown -R ${USER}:${GROUP} /home/${USER} && \
     # add /workspace and give user permissions
