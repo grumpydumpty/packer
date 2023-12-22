@@ -21,7 +21,7 @@ ARG GROUP_ID=100
 
 # update repositories, install packages, and then clean up
 RUN tdnf update -y && \
-    tdnf install -y ca-certificates coreutils curl jq shadow tar unzip && \
+    tdnf install -y bash ca-certificates coreutils curl jq shadow tar unzip vim && \
     # add user/group
     # groupadd -g ${GROUP_ID} ${GROUP} && \
     # useradd -u ${USER_ID} -g ${GROUP} -m ${USER} && \
