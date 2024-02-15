@@ -1,7 +1,7 @@
 # Project Information
 site_name: Packer
 site_description: Docker container with Hashicorp Packer.
-site_url: http://packer.lab.net
+site_url: http://containers.lab.net/packer
 site_author: Broadcom
 docs_dir: docs
 site_dir: .site
