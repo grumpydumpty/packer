@@ -2,6 +2,8 @@ FROM base:dev
 
 # set argument defaults
 ARG OS_ARCH="amd64"
+ARG USER=vlabs
+ARG GROUP=users
 
 # Switch to root to install OS packages
 USER root:root
@@ -48,7 +50,7 @@ RUN chown -R root:root /usr/local/bin/ && \
     chmod 755 /usr/lib/
 
 # switch back to non-root user
-USER ${USER}
+USER ${USER}:${GROUP}
 
 # set entrypoint to packer, not a shell
 ENTRYPOINT ["packer"]
